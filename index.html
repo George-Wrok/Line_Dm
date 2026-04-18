@@ -29,27 +29,43 @@
         <main class="glass-container">
             <!-- Left Side: Inputs -->
             <section class="editor-section">
-                <div class="card">
-                    <h2>1. 編輯內容</h2>
-                    <div class="input-group">
-                        <label for="message-input">促銷文案</label>
-                        <textarea id="message-input" placeholder="在這裡輸入您的促銷訊息..."></textarea>
+                    <div class="mode-tabs">
+                        <button class="tab-btn active" data-mode="standard">標準模式</button>
+                        <button class="tab-btn" data-mode="flex">Flex JSON 模式</button>
                     </div>
-                    
-                    <div class="input-group">
-                        <label>2. 附加圖片</label>
-                        <div id="drop-zone" class="upload-area">
-                            <input type="file" id="image-input" accept="image/*" hidden>
-                            <div class="upload-placeholder">
-                                <span class="upload-icon">📸</span>
-                                <p>點擊或拖曳圖片至此</p>
-                                <small>建議比例 1.91:1 或 1:1</small>
+
+                    <div id="standard-mode-content" class="mode-content">
+                        <div class="input-group">
+                            <label for="message-input">促銷文案</label>
+                            <textarea id="message-input" placeholder="在這裡輸入您的促銷訊息..."></textarea>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>2. 附加圖片</label>
+                            <div id="drop-zone" class="upload-area">
+                                <input type="file" id="image-input" accept="image/*" hidden>
+                                <div class="upload-placeholder">
+                                    <span class="upload-icon">📸</span>
+                                    <p>點擊或拖曳圖片至此</p>
+                                    <small>建議比例 1.91:1 或 1:1</small>
+                                </div>
+                                <img id="image-preview" class="hidden">
+                                <button id="remove-img" class="btn-icon hidden">✕</button>
                             </div>
-                            <img id="image-preview" class="hidden">
-                            <button id="remove-img" class="btn-icon hidden">✕</button>
                         </div>
                     </div>
-                </div>
+
+                    <div id="flex-mode-content" class="mode-content hidden">
+                        <div class="input-group">
+                            <label for="flex-json-input">Flex Message JSON</label>
+                            <div class="json-editor-container">
+                                <textarea id="flex-json-input" placeholder='請貼上從 Flex Message Simulator 複製的 JSON...'></textarea>
+                                <div id="json-status" class="status-badge valid hidden">JSON 格式正確</div>
+                                <div id="json-error" class="status-badge invalid hidden">JSON 格式錯誤</div>
+                            </div>
+                            <p class="input-hint">到 <a href="https://developers.line.biz/flex-simulator/" target="_blank">Flex Message Simulator</a> 設計並複製 JSON</p>
+                        </div>
+                    </div>
             </section>
 
             <!-- Right Side: Preview -->

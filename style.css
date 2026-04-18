@@ -53,6 +53,7 @@ header {
 .pro-tag {
     background: linear-gradient(135deg, var(--primary), #00ff88);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     font-style: italic;
     padding-right: 4px; /* Fix for clipped "O" */
@@ -157,39 +158,87 @@ header {
 }
 
 /* Editor Panel */
-.editor-section h2 {
-    margin-bottom: 24px;
-    font-weight: 600;
-}
-
-.input-group {
-    margin-bottom: 24px;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--text-dim);
-    font-size: 0.9rem;
-}
-
-textarea {
-    width: 100%;
-    height: 150px;
+/* Mode Tabs */
+.mode-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
     background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--glass-border);
+    padding: 5px;
     border-radius: 12px;
-    padding: 15px;
-    color: white;
-    font-family: inherit;
-    font-size: 1rem;
-    resize: none;
-    transition: border-color 0.3s;
+    border: 1px solid var(--glass-border);
 }
 
-textarea:focus {
-    outline: none;
-    border-color: var(--primary);
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+.mode-content {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* JSON Editor */
+.json-editor-container {
+    position: relative;
+}
+
+#flex-json-input {
+    height: 300px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    background: #000;
+}
+
+.status-badge {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.status-badge.valid {
+    background: var(--primary);
+    color: white;
+}
+
+.status-badge.invalid {
+    background: #ff4d4d;
+    color: white;
+}
+
+.input-hint {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+.input-hint a {
+    color: var(--accent);
+    text-decoration: none;
 }
 
 /* Upload Area */
