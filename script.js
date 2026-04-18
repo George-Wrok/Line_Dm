@@ -99,39 +99,79 @@ function updatePreview() {
 }
 
 /**
- * Simplified Flex Message Preview Renderer
+ * Upgraded Flex Message Preview Renderer (Recursive)
  */
 function renderFlexPreview(contents) {
     let bubble = contents;
     if (contents.type === 'carousel') {
-        bubble = contents.contents[0];
+        bubble = contents.contents[0]; // 預覽輪播的第一張卡片
     }
     
     let html = '<div class="flex-preview-root">';
-    if (bubble.hero && bubble.hero.type === 'image') {
-        html += `<div class="flex-preview-hero" style="background-image: url('${bubble.hero.url}')"></div>`;
+    
+    // 渲染 Hero 區塊 (如果有)
+    if (bubble.hero) {
+        html += parseComponent(bubble.hero);
     }
-    html += '<div class="flex-preview-body">';
-    if (bubble.body && bubble.body.contents) {
-        bubble.body.contents.forEach(item => {
-            if (item.type === 'text') {
-                const style = `color:${item.color || '#333'}; font-size:${item.size === 'xl' ? '1.1rem' : '0.8rem'}; font-weight:${item.weight === 'bold' ? '800' : '400'}`;
-                html += `<div class="${item.size === 'xl' ? 'flex-preview-title' : 'flex-preview-text'}" style="${style}">${item.text}</div>`;
-            }
-        });
+    
+    // 渲染 Body 區塊
+    if (bubble.body) {
+        html += `<div class="flex-preview-body">${parseComponent(bubble.body)}</div>`;
     }
-    html += '</div>';
-    if (bubble.footer && bubble.footer.contents) {
-        html += '<div class="flex-preview-footer">';
-        bubble.footer.contents.forEach(item => {
-            if (item.type === 'button') {
-                html += `<div class="flex-preview-btn">${item.action.label}</div>`;
-            }
-        });
-        html += '</div>';
+    
+    // 渲染 Footer 區塊
+    if (bubble.footer) {
+        html += `<div class="flex-preview-footer">${parseComponent(bubble.footer)}</div>`;
     }
+    
     html += '</div>';
     previewText.innerHTML = html;
+}
+
+/**
+ * Recursive Parser for Flex Components
+ */
+function parseComponent(item) {
+    if (!item) return '';
+    
+    if (Array.isArray(item)) {
+        return item.map(sub => parseComponent(sub)).join('');
+    }
+
+    switch (item.type) {
+        case 'box':
+            return `<div class="flex-box-${item.layout || 'vertical'}" style="display:flex; flex-direction:${item.layout === 'horizontal' ? 'row' : 'column'}; gap:4px;">
+                ${parseComponent(item.contents)}
+            </div>`;
+            
+        case 'text':
+            const style = `
+                color: ${item.color || 'inherit'};
+                font-size: ${item.size === 'xl' ? '1.1rem' : (item.size === 'xs' ? '0.7rem' : '0.85rem')};
+                font-weight: ${item.weight === 'bold' ? 'bold' : 'normal'};
+                text-align: ${item.align || 'left'};
+                text-decoration: ${item.decoration || 'none'};
+            `;
+            return `<div class="flex-text" style="${style}">${item.text}</div>`;
+            
+        case 'image':
+            return `<img src="${item.url}" style="width:100%; height:auto; border-radius:4px; margin-bottom:4px;" />`;
+            
+        case 'button':
+            return `<div class="flex-preview-btn" style="background:${item.style === 'primary' ? 'var(--primary)' : '#eee'}; color:${item.style === 'primary' ? '#fff' : '#333'}; margin-bottom:5px;">
+                ${item.action ? item.action.label : '按鈕'}
+            </div>`;
+            
+        case 'separator':
+            return `<hr style="border:none; border-top:1px solid #eee; margin:8px 0;" />`;
+            
+        case 'filler':
+            return `<div style="flex-grow:1;"></div>`;
+            
+        default:
+            if (item.contents) return parseComponent(item.contents);
+            return '';
+    }
 }
 
 function handleTabSwitch(btn) {
