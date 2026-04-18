@@ -63,20 +63,14 @@
                             </select>
                         </div>
 
-                        <div id="flex-editor-wrapper" class="hidden">
-                            <div class="input-group">
-                                <label for="flex-json-input">Flex Message JSON (進階編輯)</label>
-                                <div class="json-editor-container">
-                                    <textarea id="flex-json-input" placeholder='請貼上從 Flex Message Simulator 複製的 JSON...'></textarea>
-                                    <div id="json-status" class="status-badge valid hidden">JSON 格式正確</div>
-                                    <div id="json-error" class="status-badge invalid hidden">JSON 格式錯誤</div>
-                                </div>
-                                <p class="input-hint">到 <a href="https://developers.line.biz/flex-simulator/" target="_blank">Flex Message Simulator</a> 設計並複製 JSON</p>
-                            </div>
+                        <div id="template-info-card" class="template-info hidden">
+                            <div class="info-icon">💡</div>
+                            <div id="template-desc">請選擇上方範本以檢視使用指南。</div>
                         </div>
-                        
-                        <div class="admin-controls">
-                            <button id="toggle-json-btn" class="btn-text">🛠 顯示/隱藏 JSON 代碼</button>
+
+                        <!-- JSON Editor (Hidden for colleagues) -->
+                        <div id="flex-editor-wrapper" style="display: none;">
+                            <textarea id="flex-json-input"></textarea>
                         </div>
                     </div>
             </section>

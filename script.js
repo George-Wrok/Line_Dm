@@ -30,14 +30,12 @@ const standardContent = document.getElementById('standard-mode-content');
 const flexContent = document.getElementById('flex-mode-content');
 const flexJsonInput = document.getElementById('flex-json-input');
 const templateSelect = document.getElementById('template-select');
-const jsonStatus = document.getElementById('json-status');
-const jsonError = document.getElementById('json-error');
-
-const flexEditorWrapper = document.getElementById('flex-editor-wrapper');
-const toggleJsonBtn = document.getElementById('toggle-json-btn');
+const templateInfoCard = document.getElementById('template-info-card');
+const templateDesc = document.getElementById('template-desc');
 
 let currentMode = 'standard'; 
 let lastValidFlexJson = null;
+let templateData = []; // Store registry info
 
 async function init() {
     try {
@@ -47,7 +45,6 @@ async function init() {
         } else {
             loadUserProfile();
         }
-        // Initialize Templates from External Files
         await initTemplates();
     } catch (err) {
         console.error('LIFF Init Error:', err);
@@ -60,20 +57,15 @@ async function init() {
 async function initTemplates() {
     try {
         const response = await fetch('templates/registry.json');
-        const templates = await response.json();
+        templateData = await response.json();
         
         templateSelect.innerHTML = '<option value="">--- 請選擇範本 ---</option>';
-        templates.forEach(tpl => {
+        templateData.forEach((tpl, index) => {
             const option = document.createElement('option');
-            option.value = tpl.file;
+            option.value = index; // Store index to access full data
             option.textContent = tpl.name;
             templateSelect.appendChild(option);
         });
-        
-        const customOption = document.createElement('option');
-        customOption.value = "CUSTOM_EMPTY";
-        customOption.textContent = "✨ 自定義 (清空內容)";
-        templateSelect.appendChild(customOption);
     } catch (err) {
         console.error('Failed to load templates:', err);
         templateSelect.innerHTML = '<option value="">❌ 範本載入失敗</option>';
@@ -100,7 +92,7 @@ function updatePreview() {
         if (lastValidFlexJson) {
             renderFlexPreview(lastValidFlexJson.contents);
         } else {
-            previewText.innerHTML = '<div style="padding:20px; text-align:center; color:#888;">請選擇或輸入範本內容來檢視預覽</div>';
+            previewText.innerHTML = '<div style="padding:20px; text-align:center; color:#888;">請選擇上方範本以檢視樣式</div>';
         }
         sendBtn.disabled = !lastValidFlexJson;
     }
@@ -112,17 +104,13 @@ function updatePreview() {
 function renderFlexPreview(contents) {
     let bubble = contents;
     if (contents.type === 'carousel') {
-        bubble = contents.contents[0]; // Show first bubble for carousel
+        bubble = contents.contents[0];
     }
     
     let html = '<div class="flex-preview-root">';
-    
-    // Hero (Image)
     if (bubble.hero && bubble.hero.type === 'image') {
         html += `<div class="flex-preview-hero" style="background-image: url('${bubble.hero.url}')"></div>`;
     }
-    
-    // Body
     html += '<div class="flex-preview-body">';
     if (bubble.body && bubble.body.contents) {
         bubble.body.contents.forEach(item => {
@@ -133,8 +121,6 @@ function renderFlexPreview(contents) {
         });
     }
     html += '</div>';
-    
-    // Footer
     if (bubble.footer && bubble.footer.contents) {
         html += '<div class="flex-preview-footer">';
         bubble.footer.contents.forEach(item => {
@@ -144,7 +130,6 @@ function renderFlexPreview(contents) {
         });
         html += '</div>';
     }
-    
     html += '</div>';
     previewText.innerHTML = html;
 }
@@ -170,8 +155,6 @@ function handleTabSwitch(btn) {
 function validateFlexJson() {
     const rawVal = flexJsonInput.value.trim();
     if (!rawVal) {
-        jsonStatus.classList.add('hidden');
-        jsonError.classList.add('hidden');
         lastValidFlexJson = null;
         updatePreview();
         return;
@@ -179,10 +162,6 @@ function validateFlexJson() {
 
     try {
         let jsonObj = JSON.parse(rawVal);
-        if (jsonObj.content) { // In case they pasted the whole push body
-             jsonObj = jsonObj.content;
-        }
-
         if (jsonObj.type === 'bubble' || jsonObj.type === 'carousel') {
             lastValidFlexJson = { type: 'flex', altText: '您收到了一則 Flex Message', contents: jsonObj };
         } else if (jsonObj.type === 'flex') {
@@ -190,50 +169,44 @@ function validateFlexJson() {
         } else {
             throw new Error('Invalid format');
         }
-        jsonStatus.classList.remove('hidden');
-        jsonError.classList.add('hidden');
     } catch (e) {
-        jsonStatus.classList.add('hidden');
-        jsonError.classList.remove('hidden');
         lastValidFlexJson = null;
     }
     updatePreview();
 }
 
-async function loadTemplate(fileName) {
-    if (!fileName) return;
-    
-    if (fileName === "CUSTOM_EMPTY") {
+async function loadTemplate(index) {
+    if (index === "") {
+        templateInfoCard.classList.add('hidden');
         flexJsonInput.value = "";
         validateFlexJson();
         return;
     }
+    
+    const tpl = templateData[index];
+    templateDesc.textContent = tpl.desc || "無可用介紹。";
+    templateInfoCard.classList.remove('hidden');
 
     try {
-        const response = await fetch(`templates/${fileName}`);
+        const response = await fetch(`templates/${tpl.file}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const content = await response.json();
         flexJsonInput.value = JSON.stringify(content, null, 2);
         validateFlexJson();
     } catch (err) {
         console.error('Failed to load template file:', err);
-        alert('範本檔案讀取失敗，請檢查資料夾中是否存在該檔案。');
+        alert('範本檔案讀取失敗');
     }
 }
 
 // Event Listeners
 templateSelect.addEventListener('change', (e) => loadTemplate(e.target.value));
 msgInput.addEventListener('input', updatePreview);
-flexJsonInput.addEventListener('input', validateFlexJson);
 tabBtns.forEach(btn => btn.addEventListener('click', () => handleTabSwitch(btn)));
 dropZone.addEventListener('click', () => imageInput.click());
 imageInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
 sendBtn.addEventListener('click', startForwarding);
 logoutBtn.addEventListener('click', () => { liff.logout(); location.reload(); });
-
-toggleJsonBtn.addEventListener('click', () => {
-    flexEditorWrapper.classList.toggle('hidden');
-});
 
 async function handleFileSelect(file) {
     if (!file) return;

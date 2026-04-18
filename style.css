@@ -458,67 +458,31 @@ textarea:focus {
     font-size: 0.9rem;
 }
 
-.admin-controls {
-    margin-top: 15px;
+.template-info {
+    margin-top: 20px;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid var(--primary);
+    border-radius: 8px;
     display: flex;
-    justify-content: flex-end;
+    gap: 12px;
+    align-items: flex-start;
+    animation: slideIn 0.3s ease-out;
 }
 
-#toggle-json-btn {
-    font-size: 0.85rem;
-    opacity: 0.7;
-    transition: opacity 0.3s;
+.template-info .info-icon {
+    font-size: 1.2rem;
 }
 
-#toggle-json-btn:hover {
-    opacity: 1;
+#template-desc {
+    font-size: 0.9rem;
+    color: var(--text-main);
+    line-height: 1.6;
 }
 
-/* Flex Preview Rendering Styles */
-.flex-preview-root {
-    width: 100%;
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    color: #000;
-    font-size: 0.8rem;
-}
-
-.flex-preview-hero {
-    width: 100%;
-    aspect-ratio: 20/13;
-    background-size: cover;
-    background-position: center;
-}
-
-.flex-preview-body {
-    padding: 12px;
-}
-
-.flex-preview-title {
-    font-weight: 800;
-    font-size: 1rem;
-    margin-bottom: 4px;
-}
-
-.flex-preview-text {
-    color: #666;
-    margin-bottom: 8px;
-}
-
-.flex-preview-footer {
-    padding: 8px 12px;
-    border-top: 1px solid #eee;
-}
-
-.flex-preview-btn {
-    width: 100%;
-    padding: 8px;
-    background: var(--primary);
-    color: white;
-    text-align: center;
-    border-radius: 6px;
-    font-weight: 700;
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 /* Loading Overlay */
