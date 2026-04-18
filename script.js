@@ -207,6 +207,10 @@ dropZone.addEventListener('click', () => imageInput.click());
 imageInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
 sendBtn.addEventListener('click', startForwarding);
 logoutBtn.addEventListener('click', () => { liff.logout(); location.reload(); });
+removeImgBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    removeImage();
+});
 
 async function handleFileSelect(file) {
     if (!file) return;
@@ -248,6 +252,18 @@ async function startForwarding() {
     } finally {
         loading.classList.add('hidden');
     }
+}
+
+function removeImage() {
+    selectedFile = null;
+    if (imageInput) imageInput.value = '';
+    imagePreview.src = '';
+    imagePreview.classList.add('hidden');
+    uploadPlaceholder.classList.remove('hidden');
+    removeImgBtn.classList.add('hidden');
+    previewMsgImg.src = '';
+    previewImageBox.classList.add('hidden');
+    updatePreview();
 }
 
 init();
