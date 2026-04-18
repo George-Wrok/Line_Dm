@@ -1,4 +1,4 @@
-# LINE EDM Pro 使用手冊
+# LINE DM Pro 使用手冊
 
 本工具幫助您快速將促銷文案與圖片轉傳給多位 LINE 好友。
 
