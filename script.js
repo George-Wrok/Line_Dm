@@ -107,20 +107,7 @@ async function startForwarding() {
         
         // 1. If there's an image, upload it first
         if (selectedFile) {
-            // Check for Client ID
-            if (!window.Uploader.clientId) {
-                // If no ID, we prompt and stop
-                const id = prompt('為了發送圖片，請輸入您的 Imgur Client ID (只需輸入一次)：');
-                if (id) {
-                    window.Uploader.clientId = id;
-                } else {
-                    alert('需要 Imgur ID 才能發送圖片檔案喔！或是您可以只發送文字。');
-                    loading.classList.add('hidden');
-                    return;
-                }
-            }
-            
-            currentImageUrl = await window.Uploader.uploadToImgur(selectedFile);
+            currentImageUrl = await window.Uploader.uploadToImgBB(selectedFile);
             messages.push({
                 type: 'image',
                 originalContentUrl: currentImageUrl,
