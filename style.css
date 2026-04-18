@@ -55,6 +55,8 @@ header {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-style: italic;
+    padding-right: 4px; /* Fix for clipped "O" */
+    display: inline-block;
 }
 
 #user-profile {
@@ -94,12 +96,63 @@ header {
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-@media (max-width: 900px) {
+/* Responsive Design Updates */
+@media (max-width: 1024px) {
     .glass-container {
         grid-template-columns: 1fr;
+        gap: 40px;
     }
+    
     .preview-section {
-        display: none; /* Hide preview on mobile to save space, or move below */
+        display: flex;
+        justify-content: center;
+        order: 2; /* Put preview after editor on tablet/mobile */
+    }
+    
+    .editor-section {
+        order: 1;
+    }
+}
+
+@media (max-width: 600px) {
+    #app {
+        padding: 12px;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    .glass-container {
+        padding: 15px;
+        border-radius: 16px;
+    }
+
+    .phone-frame {
+        width: 100%;
+        max-width: 280px;
+        height: 520px;
+        border-width: 8px;
+    }
+
+    .main-btn {
+        width: 100%;
+        padding: 16px 24px;
+        font-size: 1.1rem;
+    }
+    
+    .logo h1 {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .phone-frame {
+        max-width: 260px;
+        height: 480px;
     }
 }
 
