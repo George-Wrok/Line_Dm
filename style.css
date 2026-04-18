@@ -157,7 +157,14 @@ header {
     }
 }
 
-/* Editor Panel */
+/* Editor Panel & Input Styling */
+/* Editor Panel & Input Styling */
+.editor-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 /* Mode Tabs */
 .mode-tabs {
     display: flex;
@@ -171,52 +178,95 @@ header {
 
 .tab-btn {
     flex: 1;
-    padding: 10px;
+    padding: 12px;
     border: none;
     background: transparent;
     color: var(--text-dim);
     cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    transition: all 0.3s;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tab-btn.active {
     background: var(--primary);
     color: white;
-    box-shadow: 0 4px 12px var(--primary-glow);
+    box-shadow: 0 4px 15px var(--primary-glow);
 }
 
 .mode-content {
-    animation: fadeIn 0.3s ease-out;
+    animation: fadeIn 0.4s ease-out;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* JSON Editor */
-.json-editor-container {
-    position: relative;
+.input-group {
+    margin-bottom: 28px;
+    width: 100%;
 }
 
+.input-group label {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--text-main);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 180px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 20px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    resize: vertical;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 4px var(--primary-glow), inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* JSON Editor Specific */
 #flex-json-input {
-    height: 300px;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.85rem;
-    background: #000;
+    min-height: 400px;
+    font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+    font-size: 0.9rem;
+    background: #0a0c10;
+    border-color: rgba(58, 212, 255, 0.2);
 }
 
+#flex-json-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(58, 212, 255, 0.2);
+}
+
+/* Status Badges */
 .status-badge {
     position: absolute;
-    bottom: 12px;
-    right: 12px;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 0.75rem;
+    bottom: 15px;
+    right: 15px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.8rem;
     font-weight: 700;
+    backdrop-filter: blur(10px);
+    z-index: 5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     pointer-events: none;
 }
 
@@ -230,32 +280,21 @@ header {
     color: white;
 }
 
-.input-hint {
-    margin-top: 10px;
-    font-size: 0.8rem;
-    color: var(--text-dim);
-}
-
-.input-hint a {
-    color: var(--accent);
-    text-decoration: none;
-}
-
-/* Upload Area */
+/* Upload Area Refinement */
 .upload-area {
     position: relative;
     width: 100%;
-    aspect-ratio: 16/9;
-    background: rgba(0, 0, 0, 0.2);
+    min-height: 240px;
+    background: rgba(255, 255, 255, 0.03);
     border: 2px dashed var(--glass-border);
-    border-radius: 12px;
+    border-radius: 16px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     overflow: hidden;
-    transition: all 0.3s;
+    transition: all 0.4s;
 }
 
 .upload-area:hover {
