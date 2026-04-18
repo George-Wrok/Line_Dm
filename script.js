@@ -99,79 +99,103 @@ function updatePreview() {
 }
 
 /**
- * Upgraded Flex Message Preview Renderer (Recursive)
+ * Upgraded Flex Message Preview Renderer (Professional Version)
  */
 function renderFlexPreview(contents) {
     let bubble = contents;
     if (contents.type === 'carousel') {
-        bubble = contents.contents[0]; // 預覽輪播的第一張卡片
+        bubble = contents.contents[0]; 
     }
     
-    let html = '<div class="flex-preview-root">';
+    // 渲染 Bubble 主體
+    const bg = bubble.styles && bubble.styles.body ? bubble.styles.body.backgroundColor : (bubble.backgroundColor || '#fff');
+    let html = `<div class="flex-preview-root" style="background-color: ${bg}; position: relative; display: flex; flex-direction: column;">`;
     
-    // 渲染 Hero 區塊 (如果有)
+    // 1. Header
+    if (bubble.header) {
+        html += `<div class="flex-preview-header" style="${getBoxStyle(bubble.header)}">${parseComponent(bubble.header)}</div>`;
+    }
+    
+    // 2. Hero
     if (bubble.hero) {
-        html += parseComponent(bubble.hero);
+        html += `<div class="flex-preview-hero-container">${parseComponent(bubble.hero)}</div>`;
     }
     
-    // 渲染 Body 區塊
+    // 3. Body
     if (bubble.body) {
-        html += `<div class="flex-preview-body">${parseComponent(bubble.body)}</div>`;
+        html += `<div class="flex-preview-body" style="${getBoxStyle(bubble.body)}">${parseComponent(bubble.body)}</div>`;
     }
     
-    // 渲染 Footer 區塊
+    // 4. Footer
     if (bubble.footer) {
-        html += `<div class="flex-preview-footer">${parseComponent(bubble.footer)}</div>`;
+        html += `<div class="flex-preview-footer" style="${getBoxStyle(bubble.footer)}">${parseComponent(bubble.footer)}</div>`;
     }
     
     html += '</div>';
     previewText.innerHTML = html;
 }
 
+function getBoxStyle(box) {
+    if (!box) return '';
+    const bg = box.backgroundColor ? `background-color: ${box.backgroundColor};` : '';
+    const pad = box.paddingAll ? `padding: ${parseInt(box.paddingAll)}px;` : 'padding: 12px;';
+    return `${bg} ${pad}`;
+}
+
 /**
- * Recursive Parser for Flex Components
+ * Recursive Parser for Flex Components (V3)
  */
 function parseComponent(item) {
     if (!item) return '';
-    
-    if (Array.isArray(item)) {
-        return item.map(sub => parseComponent(sub)).join('');
-    }
+    if (Array.isArray(item)) return item.map(sub => parseComponent(sub)).join('');
+    if (item.contents && item.type !== 'text') return parseComponent(item.contents);
+
+    const commonStyle = `
+        flex: ${item.flex !== undefined ? item.flex : 'none'};
+        margin-top: ${item.margin ? '8px' : '0'};
+    `;
 
     switch (item.type) {
         case 'box':
-            return `<div class="flex-box-${item.layout || 'vertical'}" style="display:flex; flex-direction:${item.layout === 'horizontal' ? 'row' : 'column'}; gap:4px;">
+            const layout = item.layout === 'horizontal' ? 'row' : 'column';
+            const align = item.alignItems ? `align-items: ${item.alignItems};` : '';
+            const justify = item.justifyContent ? `justify-content: ${item.justifyContent};` : '';
+            const boxBg = item.backgroundColor ? `background-color: ${item.backgroundColor}; padding: 8px; border-radius: 4px;` : '';
+            return `<div class="flex-box" style="display:flex; flex-direction:${layout}; ${align} ${justify} ${boxBg} gap:4px; ${commonStyle}">
                 ${parseComponent(item.contents)}
             </div>`;
             
         case 'text':
-            const style = `
+            const tStyle = `
                 color: ${item.color || 'inherit'};
-                font-size: ${item.size === 'xl' ? '1.1rem' : (item.size === 'xs' ? '0.7rem' : '0.85rem')};
+                font-size: ${getTextSize(item.size)};
                 font-weight: ${item.weight === 'bold' ? 'bold' : 'normal'};
                 text-align: ${item.align || 'left'};
-                text-decoration: ${item.decoration || 'none'};
+                white-space: ${item.wrap ? 'normal' : 'nowrap'};
+                ${commonStyle}
             `;
-            return `<div class="flex-text" style="${style}">${item.text}</div>`;
+            return `<div style="${tStyle}">${item.text || ''}</div>`;
             
         case 'image':
-            return `<img src="${item.url}" style="width:100%; height:auto; border-radius:4px; margin-bottom:4px;" />`;
+            const ratio = item.aspectRatio ? item.aspectRatio.replace(':', '/') : '1/1';
+            return `<img src="${item.url}" style="width:100%; aspect-ratio:${ratio}; object-fit:${item.aspectMode || 'cover'}; border-radius: 4px; ${commonStyle}" />`;
             
         case 'button':
-            return `<div class="flex-preview-btn" style="background:${item.style === 'primary' ? 'var(--primary)' : '#eee'}; color:${item.style === 'primary' ? '#fff' : '#333'}; margin-bottom:5px;">
+            return `<div class="flex-preview-btn" style="background:${item.style === 'primary' ? 'var(--primary)' : '#eee'}; color:${item.style === 'primary' ? '#fff' : '#333'}; ${commonStyle}">
                 ${item.action ? item.action.label : '按鈕'}
             </div>`;
             
         case 'separator':
-            return `<hr style="border:none; border-top:1px solid #eee; margin:8px 0;" />`;
-            
-        case 'filler':
-            return `<div style="flex-grow:1;"></div>`;
+            return `<hr style="border:none; border-top:1px solid #ddd; width:100%; margin:8px 0;" />`;
             
         default:
-            if (item.contents) return parseComponent(item.contents);
             return '';
     }
+}
+
+function getTextSize(size) {
+    const map = { 'xxs': '0.6rem', 'xs': '0.7rem', 'sm': '0.8rem', 'md': '0.9rem', 'lg': '1rem', 'xl': '1.1rem', 'xxl': '1.3rem' };
+    return map[size] || '0.85rem';
 }
 
 function handleTabSwitch(btn) {
