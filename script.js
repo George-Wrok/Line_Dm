@@ -99,103 +99,147 @@ function updatePreview() {
 }
 
 /**
- * Upgraded Flex Message Preview Renderer (Professional Version)
+ * Upgraded Flex Message Preview Renderer (Recursive)
+ */
+/**
+ * Upgraded Flex Message Preview Renderer (Recursive)
  */
 function renderFlexPreview(contents) {
     let bubble = contents;
     if (contents.type === 'carousel') {
-        bubble = contents.contents[0]; 
+        bubble = contents.contents[0]; // 預覽輪播的第一張卡片
     }
     
-    // 渲染 Bubble 主體
-    const bg = bubble.styles && bubble.styles.body ? bubble.styles.body.backgroundColor : (bubble.backgroundColor || '#fff');
-    let html = `<div class="flex-preview-root" style="background-color: ${bg}; position: relative; display: flex; flex-direction: column;">`;
+    let html = '<div class="flex-preview-root" style="border-radius:12px; overflow:hidden; background:#fff; position:relative;">';
     
-    // 1. Header
+    // 渲染 Header 區塊
     if (bubble.header) {
-        html += `<div class="flex-preview-header" style="${getBoxStyle(bubble.header)}">${parseComponent(bubble.header)}</div>`;
+        html += `<div class="flex-preview-header">${parseComponent(bubble.header)}</div>`;
     }
     
-    // 2. Hero
+    // 渲染 Hero 區塊
     if (bubble.hero) {
-        html += `<div class="flex-preview-hero-container">${parseComponent(bubble.hero)}</div>`;
+        html += parseComponent(bubble.hero);
     }
     
-    // 3. Body
+    // 渲染 Body 區塊
     if (bubble.body) {
-        html += `<div class="flex-preview-body" style="${getBoxStyle(bubble.body)}">${parseComponent(bubble.body)}</div>`;
+        // Body usually has padding in LINE, default is about 20px
+        const padding = bubble.body.paddingAll || '20px';
+        const bg = bubble.body.backgroundColor || '#ffffff';
+        html += `<div class="flex-preview-body" style="padding:${padding}; background-color:${bg}; position:relative;">${parseComponent(bubble.body)}</div>`;
     }
     
-    // 4. Footer
+    // 渲染 Footer 區塊
     if (bubble.footer) {
-        html += `<div class="flex-preview-footer" style="${getBoxStyle(bubble.footer)}">${parseComponent(bubble.footer)}</div>`;
+        html += `<div class="flex-preview-footer">${parseComponent(bubble.footer)}</div>`;
     }
     
     html += '</div>';
     previewText.innerHTML = html;
 }
 
-function getBoxStyle(box) {
-    if (!box) return '';
-    const bg = box.backgroundColor ? `background-color: ${box.backgroundColor};` : '';
-    const pad = box.paddingAll ? `padding: ${parseInt(box.paddingAll)}px;` : 'padding: 12px;';
-    return `${bg} ${pad}`;
-}
-
 /**
- * Recursive Parser for Flex Components (V3)
+ * Recursive Parser for Flex Components
  */
 function parseComponent(item) {
     if (!item) return '';
-    if (Array.isArray(item)) return item.map(sub => parseComponent(sub)).join('');
-    if (item.contents && item.type !== 'text') return parseComponent(item.contents);
+    
+    if (Array.isArray(item)) {
+        return item.map(sub => parseComponent(sub)).join('');
+    }
 
-    const commonStyle = `
-        flex: ${item.flex !== undefined ? item.flex : 'none'};
-        margin-top: ${item.margin ? '8px' : '0'};
-    `;
+    // 將 LINE 的 offset 轉換為 CSS，支援 px、% 等
+    const getOffset = (val) => val ? val : 'auto';
+    const isAbsolute = item.position === 'absolute';
+    
+    let baseStyle = '';
+    if (isAbsolute) {
+        baseStyle += `position: absolute; `;
+        if (item.offsetTop) baseStyle += `top: ${item.offsetTop}; `;
+        if (item.offsetBottom) baseStyle += `bottom: ${item.offsetBottom}; `;
+        if (item.offsetStart) baseStyle += `left: ${item.offsetStart}; `;
+        if (item.offsetEnd) baseStyle += `right: ${item.offsetEnd}; `;
+    } else {
+        baseStyle += `position: relative; `; // 讓子元素的 absolute 參考此層
+    }
+
+    if (item.backgroundColor) baseStyle += `background-color: ${item.backgroundColor}; `;
+    if (item.cornerRadius) baseStyle += `border-radius: ${item.cornerRadius}; `;
+    
+    // Padding 處理
+    if (item.paddingAll) {
+        baseStyle += `padding: ${item.paddingAll}; `;
+    } else {
+        if (item.paddingTop) baseStyle += `padding-top: ${item.paddingTop}; `;
+        if (item.paddingBottom) baseStyle += `padding-bottom: ${item.paddingBottom}; `;
+        if (item.paddingStart) baseStyle += `padding-left: ${item.paddingStart}; `;
+        if (item.paddingEnd) baseStyle += `padding-right: ${item.paddingEnd}; `;
+    }
+
+    // Width/Height 處理
+    if (item.width) baseStyle += `width: ${item.width}; `;
+    if (item.height) baseStyle += `height: ${item.height}; `;
+    if (item.margin) {
+        const marginMap = { 'xs': '2px', 'sm': '4px', 'md': '8px', 'lg': '12px', 'xl': '16px', 'xxl': '20px' };
+        baseStyle += `margin-top: ${marginMap[item.margin] || item.margin}; `;
+    }
+    if (item.flex !== undefined && item.flex > 0) {
+        baseStyle += `flex: ${item.flex}; `;
+    }
 
     switch (item.type) {
         case 'box':
-            const layout = item.layout === 'horizontal' ? 'row' : 'column';
-            const align = item.alignItems ? `align-items: ${item.alignItems};` : '';
-            const justify = item.justifyContent ? `justify-content: ${item.justifyContent};` : '';
-            const boxBg = item.backgroundColor ? `background-color: ${item.backgroundColor}; padding: 8px; border-radius: 4px;` : '';
-            return `<div class="flex-box" style="display:flex; flex-direction:${layout}; ${align} ${justify} ${boxBg} gap:4px; ${commonStyle}">
+            const isHorizontal = item.layout === 'horizontal' || item.layout === 'baseline';
+            const alignItems = item.layout === 'baseline' ? 'baseline' : 'stretch';
+            const spacingMap = { 'xs': '2px', 'sm': '4px', 'md': '8px', 'lg': '12px', 'xl': '16px', 'xxl': '20px' };
+            const gap = item.spacing ? (spacingMap[item.spacing] || item.spacing) : '0px';
+            
+            return `<div class="flex-box-${item.layout}" style="display:flex; flex-direction:${isHorizontal ? 'row' : 'column'}; align-items:${alignItems}; gap:${gap}; ${baseStyle} overflow:hidden;">
                 ${parseComponent(item.contents)}
             </div>`;
             
         case 'text':
-            const tStyle = `
-                color: ${item.color || 'inherit'};
-                font-size: ${getTextSize(item.size)};
-                font-weight: ${item.weight === 'bold' ? 'bold' : 'normal'};
-                text-align: ${item.align || 'left'};
-                white-space: ${item.wrap ? 'normal' : 'nowrap'};
-                ${commonStyle}
-            `;
-            return `<div style="${tStyle}">${item.text || ''}</div>`;
+            const sizeMap = { 'xxs': '0.6rem', 'xs': '0.7rem', 'sm': '0.8rem', 'md': '0.9rem', 'lg': '1rem', 'xl': '1.1rem', 'xxl': '1.3rem', '3xl': '1.6rem' };
+            const weight = item.weight === 'bold' ? 'bold' : 'normal';
+            const align = item.align || 'left';
+            const deco = item.decoration || 'none';
+            baseStyle += `color: ${item.color || 'inherit'}; font-size: ${sizeMap[item.size] || item.size || '0.9rem'}; font-weight: ${weight}; text-align: ${align}; text-decoration: ${deco}; `;
+            if (item.wrap) baseStyle += `white-space: pre-wrap; word-break: break-word; `;
+            else baseStyle += `white-space: nowrap; overflow: hidden; text-overflow: ellipsis; `;
+            
+            return `<div class="flex-text" style="${baseStyle}">${item.text || ''}</div>`;
             
         case 'image':
-            const ratio = item.aspectRatio ? item.aspectRatio.replace(':', '/') : '1/1';
-            return `<img src="${item.url}" style="width:100%; aspect-ratio:${ratio}; object-fit:${item.aspectMode || 'cover'}; border-radius: 4px; ${commonStyle}" />`;
+            let imgStyle = `width:100%; display:block; object-fit:${item.aspectMode === 'cover' ? 'cover' : 'contain'}; ${baseStyle}`;
+            if (item.aspectRatio) {
+                const ratio = item.aspectRatio.replace(':', '/');
+                imgStyle += `aspect-ratio: ${ratio}; `;
+            } else {
+                imgStyle += `aspect-ratio: 1/1; `;
+            }
+            return `<img src="${item.url}" style="${imgStyle}" />`;
             
         case 'button':
-            return `<div class="flex-preview-btn" style="background:${item.style === 'primary' ? 'var(--primary)' : '#eee'}; color:${item.style === 'primary' ? '#fff' : '#333'}; ${commonStyle}">
-                ${item.action ? item.action.label : '按鈕'}
+            return `<div class="flex-preview-btn" style="background:${item.style === 'primary' ? 'var(--primary)' : '#eee'}; color:${item.style === 'primary' ? '#fff' : '#333'}; padding: 8px; text-align: center; border-radius: 6px; font-weight: bold; cursor:pointer; ${baseStyle}">
+                ${item.action ? item.action.label : 'Button'}
             </div>`;
             
+        case 'icon':
+            const iconSizeMap = { 'xxs': '12px', 'xs': '16px', 'sm': '20px', 'md': '24px', 'lg': '28px', 'xl': '32px', 'xxl': '40px', '3xl': '48px' };
+            const iconSize = iconSizeMap[item.size] || item.size || '24px';
+            return `<img src="${item.url}" style="width:${iconSize}; height:${iconSize}; object-fit:contain; ${baseStyle}" />`;
+            
         case 'separator':
-            return `<hr style="border:none; border-top:1px solid #ddd; width:100%; margin:8px 0;" />`;
+            return `<div style="height:1px; background-color:${item.color || '#eeeeee'}; margin:${item.margin ? '8px' : '4px'} 0; ${baseStyle}"></div>`;
+            
+        case 'filler':
+            return `<div style="flex-grow:1; ${baseStyle}"></div>`;
             
         default:
+            if (item.contents) return `<div style="${baseStyle}">${parseComponent(item.contents)}</div>`;
             return '';
     }
-}
-
-function getTextSize(size) {
-    const map = { 'xxs': '0.6rem', 'xs': '0.7rem', 'sm': '0.8rem', 'md': '0.9rem', 'lg': '1rem', 'xl': '1.1rem', 'xxl': '1.3rem' };
-    return map[size] || '0.85rem';
 }
 
 function handleTabSwitch(btn) {
