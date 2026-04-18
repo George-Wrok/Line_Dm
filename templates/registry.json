@@ -1,0 +1,5 @@
+[
+    { "name": "🔥 促銷熱賣款 (單圖單按鈕)", "file": "promo_bubble.json" },
+    { "name": "📅 活動邀請 (輪播卡片)", "file": "event_carousel.json" },
+    { "name": "💼 產品詳情 (豐富圖文)", "file": "product_detail.json" }
+]

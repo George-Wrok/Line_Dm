@@ -1,0 +1,75 @@
+{
+    "type": "bubble",
+    "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+            {
+                "type": "text",
+                "text": "專業服務方案",
+                "weight": "bold",
+                "color": "#06C755",
+                "size": "sm"
+            },
+            {
+                "type": "text",
+                "text": "年度 VIP 會員",
+                "weight": "bold",
+                "size": "xxl",
+                "margin": "md"
+            },
+            {
+                "type": "separator",
+                "margin": "xxl"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "margin": "xxl",
+                "spacing": "sm",
+                "contents": [
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "服務點數",
+                                "size": "sm",
+                                "color": "#555555",
+                                "flex": 0
+                            },
+                            {
+                                "type": "text",
+                                "text": "無限次數",
+                                "size": "sm",
+                                "color": "#111111",
+                                "align": "right"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "有效期限",
+                                "size": "sm",
+                                "color": "#555555",
+                                "flex": 0
+                            },
+                            {
+                                "type": "text",
+                                "text": "一年",
+                                "size": "sm",
+                                "color": "#111111",
+                                "align": "right"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

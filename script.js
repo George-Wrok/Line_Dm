@@ -24,15 +24,16 @@ const userImg = document.getElementById('user-img');
 const userName = document.getElementById('user-name');
 const logoutBtn = document.getElementById('logout-btn');
 
-// New Mode Tabs Elements
+// Mode Tabs & Template Elements
 const tabBtns = document.querySelectorAll('.tab-btn');
 const standardContent = document.getElementById('standard-mode-content');
 const flexContent = document.getElementById('flex-mode-content');
 const flexJsonInput = document.getElementById('flex-json-input');
+const templateSelect = document.getElementById('template-select');
 const jsonStatus = document.getElementById('json-status');
 const jsonError = document.getElementById('json-error');
 
-let currentMode = 'standard'; // 'standard' or 'flex'
+let currentMode = 'standard'; 
 let lastValidFlexJson = null;
 
 async function init() {
@@ -43,9 +44,36 @@ async function init() {
         } else {
             loadUserProfile();
         }
+        // Initialize Templates from External Files
+        await initTemplates();
     } catch (err) {
         console.error('LIFF Init Error:', err);
-        alert('LIFF 初始化失敗，請檢查設定或重新整理');
+    }
+}
+
+/**
+ * Fetch the registry and populate the dropdown
+ */
+async function initTemplates() {
+    try {
+        const response = await fetch('templates/registry.json');
+        const templates = await response.json();
+        
+        templateSelect.innerHTML = '<option value="">--- 請選擇範本 ---</option>';
+        templates.forEach(tpl => {
+            const option = document.createElement('option');
+            option.value = tpl.file;
+            option.textContent = tpl.name;
+            templateSelect.appendChild(option);
+        });
+        
+        const customOption = document.createElement('option');
+        customOption.value = "CUSTOM_EMPTY";
+        customOption.textContent = "✨ 自定義 (清空內容)";
+        templateSelect.appendChild(customOption);
+    } catch (err) {
+        console.error('Failed to load templates:', err);
+        templateSelect.innerHTML = '<option value="">❌ 範本載入失敗</option>';
     }
 }
 
@@ -74,7 +102,6 @@ function updatePreview() {
 function handleTabSwitch(btn) {
     const mode = btn.dataset.mode;
     currentMode = mode;
-    
     tabBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     
@@ -85,9 +112,8 @@ function handleTabSwitch(btn) {
     } else {
         standardContent.classList.add('hidden');
         flexContent.classList.remove('hidden');
-        previewImageBox.classList.add('hidden'); // Hide simple preview for flex
+        previewImageBox.classList.add('hidden');
     }
-    
     updatePreview();
 }
 
@@ -103,22 +129,15 @@ function validateFlexJson() {
 
     try {
         let jsonObj = JSON.parse(rawVal);
-        
-        // Handle full object wrap or just contents
         if (jsonObj.type === 'bubble' || jsonObj.type === 'carousel') {
-            lastValidFlexJson = {
-                type: 'flex',
-                altText: '您收到了一則 Flex Message',
-                contents: jsonObj
-            };
+            lastValidFlexJson = { type: 'flex', altText: '您收到了一則 Flex Message', contents: jsonObj };
         } else if (jsonObj.type === 'flex') {
             lastValidFlexJson = jsonObj;
         } else if (Array.isArray(jsonObj) && jsonObj[0].type === 'flex') {
             lastValidFlexJson = jsonObj[0];
         } else {
-            throw new Error('不正確的 Flex JSON 格式');
+            throw new Error('Invalid format');
         }
-
         jsonStatus.classList.remove('hidden');
         jsonError.classList.add('hidden');
     } catch (e) {
@@ -129,136 +148,77 @@ function validateFlexJson() {
     updatePreview();
 }
 
+async function loadTemplate(fileName) {
+    if (!fileName) return;
+    
+    if (fileName === "CUSTOM_EMPTY") {
+        flexJsonInput.value = "";
+        validateFlexJson();
+        return;
+    }
+
+    try {
+        const response = await fetch(`templates/${fileName}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const content = await response.json();
+        flexJsonInput.value = JSON.stringify(content, null, 2);
+        validateFlexJson();
+    } catch (err) {
+        console.error('Failed to load template file:', err);
+        alert('範本檔案讀取失敗，請檢查資料夾中是否存在該檔案。');
+    }
+}
+
+// Event Listeners
+templateSelect.addEventListener('change', (e) => loadTemplate(e.target.value));
+msgInput.addEventListener('input', updatePreview);
+flexJsonInput.addEventListener('input', validateFlexJson);
+tabBtns.forEach(btn => btn.addEventListener('click', () => handleTabSwitch(btn)));
+dropZone.addEventListener('click', () => imageInput.click());
+imageInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
+sendBtn.addEventListener('click', startForwarding);
+logoutBtn.addEventListener('click', () => { liff.logout(); location.reload(); });
+
 async function handleFileSelect(file) {
     if (!file) return;
-    
     selectedFile = file;
     const dataUrl = await window.Uploader.readAsDataURL(file);
-    
-    // Show in Editor
     imagePreview.src = dataUrl;
     imagePreview.classList.remove('hidden');
     uploadPlaceholder.classList.add('hidden');
     removeImgBtn.classList.remove('hidden');
-    
-    // Show in Preview
     previewMsgImg.src = dataUrl;
-    if (currentMode === 'standard') {
-        previewImageBox.classList.remove('hidden');
-    }
-    
+    if (currentMode === 'standard') previewImageBox.classList.remove('hidden');
     updatePreview();
 }
 
-function removeImage() {
-    selectedFile = null;
-    currentImageUrl = null;
-    imagePreview.src = '';
-    imagePreview.classList.add('hidden');
-    uploadPlaceholder.classList.remove('hidden');
-    removeImgBtn.classList.add('hidden');
-    
-    previewMsgImg.src = '';
-    previewImageBox.classList.add('hidden');
-    updatePreview();
-}
-
-/**
- * The core forwarding logic
- */
 async function startForwarding() {
-    if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-    }
-
+    if (!liff.isLoggedIn()) { liff.login(); return; }
     loading.classList.remove('hidden');
-    
     try {
         let messages = [];
-        
         if (currentMode === 'standard') {
-            const text = msgInput.value.trim();
-            // 1. If there's an image, upload it first
             if (selectedFile) {
                 currentImageUrl = await window.Uploader.uploadToImgBB(selectedFile);
-                messages.push({
-                    type: 'image',
-                    originalContentUrl: currentImageUrl,
-                    previewImageUrl: currentImageUrl
-                });
+                messages.push({ type: 'image', originalContentUrl: currentImageUrl, previewImageUrl: currentImageUrl });
             }
-            
-            // 2. Add text message
-            if (text) {
-                messages.push({
-                    type: 'text',
-                    text: text
-                });
-            }
+            if (msgInput.value.trim()) messages.push({ type: 'text', text: msgInput.value.trim() });
         } else {
-            // Flex Mode
             if (!lastValidFlexJson) throw new Error('請先輸入正確的 Flex JSON');
             messages = [lastValidFlexJson];
         }
-
         if (messages.length === 0) return;
-
-        // 3. Trigger Share Target Picker
         if (liff.isApiAvailable('shareTargetPicker')) {
             const res = await liff.shareTargetPicker(messages);
-            if (res) {
-                console.log('Successfully shared');
-                alert('已成功送出！');
-            } else {
-                console.log('Share canceled');
-            }
+            if (res) alert('已成功送出！');
         } else {
-            alert('您的 LINE 版本不支援 shareTargetPicker 或未開啟該功能。');
+            alert('不支援 shareTargetPicker');
         }
     } catch (err) {
-        console.error('Send Error:', err);
-        alert('發生錯誤：' + err.message);
+        alert('錯誤：' + err.message);
     } finally {
         loading.classList.add('hidden');
     }
 }
 
-// Event Listeners
-msgInput.addEventListener('input', updatePreview);
-flexJsonInput.addEventListener('input', validateFlexJson);
-
-tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => handleTabSwitch(btn));
-});
-
-dropZone.addEventListener('click', () => imageInput.click());
-imageInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
-
-dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.classList.add('drag-active');
-});
-
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
-
-dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('drag-active');
-    handleFileSelect(e.dataTransfer.files[0]);
-});
-
-removeImgBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    removeImage();
-});
-
-sendBtn.addEventListener('click', startForwarding);
-
-logoutBtn.addEventListener('click', () => {
-    liff.logout();
-    location.reload();
-});
-
-// Start the APP
 init();
