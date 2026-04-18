@@ -33,6 +33,9 @@ const templateSelect = document.getElementById('template-select');
 const jsonStatus = document.getElementById('json-status');
 const jsonError = document.getElementById('json-error');
 
+const flexEditorWrapper = document.getElementById('flex-editor-wrapper');
+const toggleJsonBtn = document.getElementById('toggle-json-btn');
+
 let currentMode = 'standard'; 
 let lastValidFlexJson = null;
 
@@ -94,9 +97,56 @@ function updatePreview() {
         previewText.textContent = text || '您的訊息預覽會顯示在這裡...';
         sendBtn.disabled = !(text.trim() || selectedFile);
     } else {
-        previewText.innerHTML = '<span style="color:var(--primary)">✨ Flex Message 模式已啟動</span><br><small>格式驗證後即可發送</small>';
+        if (lastValidFlexJson) {
+            renderFlexPreview(lastValidFlexJson.contents);
+        } else {
+            previewText.innerHTML = '<div style="padding:20px; text-align:center; color:#888;">請選擇或輸入範本內容來檢視預覽</div>';
+        }
         sendBtn.disabled = !lastValidFlexJson;
     }
+}
+
+/**
+ * Simplified Flex Message Preview Renderer
+ */
+function renderFlexPreview(contents) {
+    let bubble = contents;
+    if (contents.type === 'carousel') {
+        bubble = contents.contents[0]; // Show first bubble for carousel
+    }
+    
+    let html = '<div class="flex-preview-root">';
+    
+    // Hero (Image)
+    if (bubble.hero && bubble.hero.type === 'image') {
+        html += `<div class="flex-preview-hero" style="background-image: url('${bubble.hero.url}')"></div>`;
+    }
+    
+    // Body
+    html += '<div class="flex-preview-body">';
+    if (bubble.body && bubble.body.contents) {
+        bubble.body.contents.forEach(item => {
+            if (item.type === 'text') {
+                const style = `color:${item.color || '#333'}; font-size:${item.size === 'xl' ? '1.1rem' : '0.8rem'}; font-weight:${item.weight === 'bold' ? '800' : '400'}`;
+                html += `<div class="${item.size === 'xl' ? 'flex-preview-title' : 'flex-preview-text'}" style="${style}">${item.text}</div>`;
+            }
+        });
+    }
+    html += '</div>';
+    
+    // Footer
+    if (bubble.footer && bubble.footer.contents) {
+        html += '<div class="flex-preview-footer">';
+        bubble.footer.contents.forEach(item => {
+            if (item.type === 'button') {
+                html += `<div class="flex-preview-btn">${item.action.label}</div>`;
+            }
+        });
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    previewText.innerHTML = html;
 }
 
 function handleTabSwitch(btn) {
@@ -129,12 +179,14 @@ function validateFlexJson() {
 
     try {
         let jsonObj = JSON.parse(rawVal);
+        if (jsonObj.content) { // In case they pasted the whole push body
+             jsonObj = jsonObj.content;
+        }
+
         if (jsonObj.type === 'bubble' || jsonObj.type === 'carousel') {
             lastValidFlexJson = { type: 'flex', altText: '您收到了一則 Flex Message', contents: jsonObj };
         } else if (jsonObj.type === 'flex') {
             lastValidFlexJson = jsonObj;
-        } else if (Array.isArray(jsonObj) && jsonObj[0].type === 'flex') {
-            lastValidFlexJson = jsonObj[0];
         } else {
             throw new Error('Invalid format');
         }
@@ -178,6 +230,10 @@ dropZone.addEventListener('click', () => imageInput.click());
 imageInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
 sendBtn.addEventListener('click', startForwarding);
 logoutBtn.addEventListener('click', () => { liff.logout(); location.reload(); });
+
+toggleJsonBtn.addEventListener('click', () => {
+    flexEditorWrapper.classList.toggle('hidden');
+});
 
 async function handleFileSelect(file) {
     if (!file) return;
