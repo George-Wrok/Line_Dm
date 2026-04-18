@@ -101,38 +101,41 @@ function updatePreview() {
 /**
  * Upgraded Flex Message Preview Renderer (Recursive)
  */
-/**
- * Upgraded Flex Message Preview Renderer (Recursive)
- */
 function renderFlexPreview(contents) {
     let bubble = contents;
     if (contents.type === 'carousel') {
-        bubble = contents.contents[0]; // 預覽輪播的第一張卡片
+        bubble = contents.contents[0];
     }
     
-    let html = '<div class="flex-preview-root" style="border-radius:12px; overflow:hidden; background:#fff; position:relative;">';
+    let html = '<div class="flex-preview-root" style="border-radius:12px; overflow:hidden; background:#fff;">';
     
-    // 渲染 Header 區塊
+    // Header
     if (bubble.header) {
-        html += `<div class="flex-preview-header">${parseComponent(bubble.header)}</div>`;
+        const h = bubble.header;
+        const hPad = h.paddingAll || '0px';
+        const hBg = h.backgroundColor || 'transparent';
+        html += `<div style="padding:${hPad}; background:${hBg}; position:relative; overflow:hidden;">${parseComponent(h.contents)}</div>`;
     }
     
-    // 渲染 Hero 區塊
+    // Hero
     if (bubble.hero) {
         html += parseComponent(bubble.hero);
     }
     
-    // 渲染 Body 區塊
+    // Body
     if (bubble.body) {
-        // Body usually has padding in LINE, default is about 20px
-        const padding = bubble.body.paddingAll || '20px';
-        const bg = bubble.body.backgroundColor || '#ffffff';
-        html += `<div class="flex-preview-body" style="padding:${padding}; background-color:${bg}; position:relative;">${parseComponent(bubble.body)}</div>`;
+        const b = bubble.body;
+        const bPad = b.paddingAll || '20px';
+        const bBg = b.backgroundColor || '#ffffff';
+        html += `<div style="padding:${bPad}; background:${bBg}; position:relative; overflow:hidden;">${parseComponent(b.contents)}</div>`;
     }
     
-    // 渲染 Footer 區塊
+    // Footer
     if (bubble.footer) {
-        html += `<div class="flex-preview-footer">${parseComponent(bubble.footer)}</div>`;
+        const f = bubble.footer;
+        const fPad = f.paddingAll || '12px';
+        const fBg = f.backgroundColor || 'transparent';
+        html += `<div style="padding:${fPad}; background:${fBg};">${parseComponent(f.contents)}</div>`;
     }
     
     html += '</div>';
