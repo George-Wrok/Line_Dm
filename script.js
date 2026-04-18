@@ -1,5 +1,5 @@
 /**
- * Main Logic for LINE EDM Pro
+ * Main Logic for LINE DM | 快速群發助手
  */
 
 const liffId = '2009827667-om3Bmciu';
