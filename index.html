@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE EDM Pro | 快速群發助手</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- LIFF SDK -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <div id="app">
+        <header>
+            <div class="logo">
+                <span class="icon">🚀</span>
+                <h1>LINE EDM <span class="pro-tag">PRO</span></h1>
+            </div>
+            <div id="user-profile" class="hidden">
+                <img id="user-img" src="" alt="Profile">
+                <span id="user-name"></span>
+                <button id="logout-btn" class="btn-text">登出</button>
+            </div>
+        </header>
+
+        <main class="glass-container">
+            <!-- Left Side: Inputs -->
+            <section class="editor-section">
+                <div class="card">
+                    <h2>1. 編輯內容</h2>
+                    <div class="input-group">
+                        <label for="message-input">促銷文案</label>
+                        <textarea id="message-input" placeholder="在這裡輸入您的促銷訊息..."></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>2. 附加圖片</label>
+                        <div id="drop-zone" class="upload-area">
+                            <input type="file" id="image-input" accept="image/*" hidden>
+                            <div class="upload-placeholder">
+                                <span class="upload-icon">📸</span>
+                                <p>點擊或拖曳圖片至此</p>
+                                <small>建議比例 1.91:1 或 1:1</small>
+                            </div>
+                            <img id="image-preview" class="hidden">
+                            <button id="remove-img" class="btn-icon hidden">✕</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: Preview -->
+            <section class="preview-section">
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>19:41</span>
+                            <div class="status-icons">📶 🔋</div>
+                        </div>
+                        <div class="chat-header">
+                            <span class="back">❮</span>
+                            <span class="chat-title">客戶名稱</span>
+                            <span class="menu">☰</span>
+                        </div>
+                        <div class="chat-body">
+                            <!-- LINE Message Bubble -->
+                            <div class="message-bubble">
+                                <div id="preview-image-box" class="preview-img-container hidden">
+                                    <img id="msg-img-preview" src="">
+                                </div>
+                                <div id="preview-text" class="preview-text-content">
+                                    您的訊息預覽會顯示在這裡...
+                                </div>
+                                <div class="msg-footer">
+                                    <span class="time">19:42</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <section class="action-bar">
+            <button id="send-btn" class="main-btn pulse-btn" disabled>
+                <span class="btn-icon">💬</span>
+                開始群發給好友
+            </button>
+            <p class="hint">點擊後可勾選多位好友進行發送（每次最多約 10-15 人）</p>
+        </section>
+
+        <!-- Loading Overlay -->
+        <div id="loading" class="overlay hidden">
+            <div class="loader"></div>
+            <p>圖片處理中，請稍候...</p>
+        </div>
+    </div>
+
+    <script src="uploader.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
