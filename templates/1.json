@@ -9,7 +9,7 @@
         "contents": [
           {
             "type": "image",
-            "url": "https://developers-resource.landpress.line.me/fx/clip/clip1.jpg",
+            "url": "https://i.ibb.co/tMJh6Yjc/Gemini-Generated-Image-wi690wwi690wwi69.png",
             "size": "full",
             "aspectMode": "cover",
             "aspectRatio": "2:3",
@@ -25,32 +25,50 @@
                 "contents": [
                   {
                     "type": "text",
-                    "text": "Brown's T-shirts",
+                    "text": "Nuron世代、一價解鎖",
                     "size": "xl",
                     "color": "#ffffff",
-                    "weight": "bold"
+                    "weight": "bold",
+                    "margin": "none"
                   }
                 ]
               },
               {
                 "type": "box",
-                "layout": "baseline",
+                "layout": "vertical",
                 "contents": [
                   {
                     "type": "text",
-                    "text": "¥35,800",
-                    "color": "#ebebeb",
+                    "text": "TE 4-22 無限鎚鑽*1",
+                    "color": "#ffffff",
                     "size": "sm",
-                    "flex": 0
+                    "flex": 0,
+                    "offsetTop": "none",
+                    "margin": "none"
                   },
                   {
                     "type": "text",
-                    "text": "¥75,000",
-                    "color": "#ffffffcc",
-                    "decoration": "line-through",
-                    "gravity": "bottom",
+                    "text": "B 22-85 Nuron電池*1",
+                    "color": "#ffffff",
+                    "flex": 0,
+                    "size": "sm",
+                    "margin": "none"
+                  },
+                  {
+                    "type": "text",
+                    "text": "C 4-22 Nuron輕便充電器*1",
+                    "margin": "none",
+                    "color": "#ffffff",
                     "flex": 0,
                     "size": "sm"
+                  },
+                  {
+                    "type": "text",
+                    "text": "HILTI 原廠專屬工具袋*1",
+                    "size": "sm",
+                    "margin": "none",
+                    "flex": 0,
+                    "color": "#ffffff"
                   }
                 ],
                 "spacing": "lg"
@@ -75,10 +93,11 @@
                       },
                       {
                         "type": "text",
-                        "text": "Add to cart",
+                        "text": "$ 19,030",
                         "color": "#ffffff",
                         "flex": 0,
-                        "offsetTop": "-2px"
+                        "offsetTop": "-2px",
+                        "size": "lg"
                       },
                       {
                         "type": "filler"
@@ -112,11 +131,10 @@
             "contents": [
               {
                 "type": "text",
-                "text": "SALE",
+                "text": "Sale",
                 "color": "#ffffff",
                 "align": "center",
-                "size": "xs",
-                "offsetTop": "3px"
+                "size": "xs"
               }
             ],
             "position": "absolute",
@@ -139,7 +157,7 @@
         "contents": [
           {
             "type": "image",
-            "url": "https://developers-resource.landpress.line.me/fx/clip/clip2.jpg",
+            "url": "https://i.ibb.co/rf50r5vg/Gemini-Generated-Image-36a27036a27036a2.png",
             "size": "full",
             "aspectMode": "cover",
             "aspectRatio": "2:3",
@@ -155,7 +173,7 @@
                 "contents": [
                   {
                     "type": "text",
-                    "text": "Cony's T-shirts",
+                    "text": "年度最強檔、震撼升級",
                     "size": "xl",
                     "color": "#ffffff",
                     "weight": "bold"
@@ -164,22 +182,38 @@
               },
               {
                 "type": "box",
-                "layout": "baseline",
+                "layout": "vertical",
                 "contents": [
                   {
                     "type": "text",
-                    "text": "¥35,800",
-                    "color": "#ebebeb",
+                    "text": "SF 4H-22 無線電鑽*1",
+                    "color": "#ffffff",
                     "size": "sm",
-                    "flex": 0
+                    "flex": 0,
+                    "margin": "none"
                   },
                   {
                     "type": "text",
-                    "text": "¥75,000",
-                    "color": "#ffffffcc",
-                    "decoration": "line-through",
-                    "gravity": "bottom",
+                    "text": "B 22-55 Nuron 電池*1",
+                    "color": "#ffffff",
                     "flex": 0,
+                    "size": "sm",
+                    "margin": "none"
+                  },
+                  {
+                    "type": "text",
+                    "text": "C 4-22 Nuron輕便充電器",
+                    "color": "#ffffff",
+                    "flex": 0,
+                    "margin": "none",
+                    "size": "sm"
+                  },
+                  {
+                    "type": "text",
+                    "text": "HILTI 原廠專屬工具袋*1",
+                    "color": "#ffffff",
+                    "flex": 0,
+                    "margin": "none",
                     "size": "sm"
                   }
                 ],
@@ -205,10 +239,10 @@
                       },
                       {
                         "type": "text",
-                        "text": "Add to cart",
+                        "text": "$ 12,030",
                         "color": "#ffffff",
                         "flex": 0,
-                        "offsetTop": "-2px"
+                        "size": "lg"
                       },
                       {
                         "type": "filler"
@@ -242,7 +276,7 @@
             "contents": [
               {
                 "type": "text",
-                "text": "SALE",
+                "text": "Sale",
                 "color": "#ffffff",
                 "align": "center",
                 "size": "xs",
